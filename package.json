@@ -1,0 +1,24 @@
+{
+  "name": "solunch-bot",
+  "version": "1.0.0",
+  "description": "A bot designed for Solink's Slack team to handle lunch polls.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anhuynh/solunch-bot.git"
+  },
+  "author": "An Huynh",
+  "bugs": {
+    "url": "https://github.com/anhuynh/solunch-bot/issues"
+  },
+  "homepage": "https://github.com/anhuynh/solunch-bot#readme",
+  "dependencies": {
+    "botkit": "^0.2.2",
+    "dotenv": "^2.0.0",
+    "node-schedule": "^1.1.1"
+  }
+}
