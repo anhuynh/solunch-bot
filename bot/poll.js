@@ -171,7 +171,6 @@ function poll(controller, bot) {
       controller.storage.teams.get('options', function(err, data) {
          if (helper.isEmpty(data.list)) {
             data.list['1'] = {name: message.match[1]};
-            controller.storage.teams.save(data);
          } else {
             var addOption = message.match[1].toLowerCase(),
             dup = false;
@@ -186,12 +185,12 @@ function poll(controller, bot) {
                var highest = Object.keys(data.list).pop();
                highest = parseInt(highest) + 1;
                data.list[highest.toString()] = {name: message.match[1]};
-               controller.storage.teams.save(data, function(err, id) {
-                  bot.reply(message, "Successfully saved *" + message.match[1] + "* as a poll option.");
-                  self.list(message);
-               });
             }
          }
+         controller.storage.teams.save(data, function(err, id) {
+            bot.reply(message, "Successfully saved *" + message.match[1] + "* as a poll option.");
+            self.list(message);
+         });
       });
    }
 
