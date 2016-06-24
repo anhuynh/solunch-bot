@@ -16,7 +16,7 @@ webhook=<YOUR INCOMING WEBHOOK URL>
 
 Then to deploy the bot, run:
 ```
-node solunch_bot.js
+node solunch-bot.js
 ```
 
 ### Deploy Indefinitely
@@ -28,12 +28,12 @@ npm install -g forever
 
 When you're ready to run the bot, you can run the command:
 ```
-forever start solunch_bot.js
+forever start solunch-bot.js
 ```
 
 To stop the bot:
 ```
-forever stop solunch_bot.js
+forever stop solunch-bot.js
 ```
 
 ## First Deployment
@@ -49,7 +49,7 @@ Note that if you want to add yourself as an admin, you won't be able to use auto
 
 ### Administrative Commands
 
-The following must be direct messaged to the bot:
+**The following must be direct messaged to the bot:**
 
 `add admin @<USERNAME>`: Adds the user as an admin (**super admin only**).
 
@@ -61,11 +61,17 @@ The following must be direct messaged to the bot:
 
 ### Poll Commands
 
-The folowing must be called in the channel that the bot is in by direct mentioning the bot before the command:
+**The folowing must be called in the channel that the bot is in by direct mentioning the bot before the command:**
 
 `start poll`: Launches the lunch poll which will have the bot direct message all users (**admins only**).
 
 `close poll`, `end poll`, `stop poll`: Closes the poll and announces the winner (**admins only**).
+
+**The following must be direct messaged to the bot.**
+
+`add option <OPTION>`: Adds an option to the list. Capitalize the option as you would want to see it on the list (**admins only**).
+
+`remove option <OPTION>`: Removes an option from the list. Spelling matters but capitalization does not (**admins only**).
 
 `options`: View a list of the poll options and numbers to vote for.
 
