@@ -27,17 +27,10 @@ var bot = controller.spawn({
 var poll = new pollFunctions(controller, bot),
 admin = new adminFunctions(controller, bot);
 
-controller.storage.teams.get('admins', function(err, data){
+controller.storage.teams.get('settings', function(err, data){
    if (data == null) {
-      controller.storage.teams.save({id: 'admins', users: {}});
-      console.log("Created admin file");
-   }
-});
-
-controller.storage.teams.get('options', function(err, data) {
-   if (data == null) {
-      controller.storage.teams.save({id: 'options', list: {}});
-      console.log("Created options file");
+      controller.storage.teams.save({id: 'settings', admins: {}, options: {}});
+      console.log("Created settings file");
    }
 });
 
@@ -49,8 +42,8 @@ controller.hears(['are you there'], ['direct_message','direct_mention','mention'
 //                                                          ADMINISTRATION                                                     //
 //*****************************************************************************************************************************//
 controller.hears('add admin (.*)', 'direct_message', function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (helper.isEmpty(data.users) || data.users[message.user].hasOwnProperty('super')) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (helper.isEmpty(data.admins) || data.admins[message.user].hasOwnProperty('super')) {
          admin.add(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to add admins.");
@@ -59,8 +52,8 @@ controller.hears('add admin (.*)', 'direct_message', function(bot, message) {
 });
 
 controller.hears('remove admin (.*)', 'direct_message', function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users[message.user].hasOwnProperty('super')) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins[message.user].hasOwnProperty('super')) {
          admin.remove(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to remove admins.");
@@ -73,8 +66,8 @@ controller.hears('list admins', 'direct_message', function(bot, message) {
 });
 
 controller.hears('user status', 'direct_message', function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users.hasOwnProperty(message.user)) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
          poll.userStatus(message);
       } else {
          bot.reply(message, "Sorry, you are not authorized to view this information.");
@@ -83,9 +76,9 @@ controller.hears('user status', 'direct_message', function(bot, message) {
 });
 
 controller.hears('add option (.*)', 'direct_message', function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users.hasOwnProperty(message.user)) {
-         poll.addOption(message);
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
+         poll.addOption(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to add a poll option.");
       }
@@ -93,9 +86,9 @@ controller.hears('add option (.*)', 'direct_message', function(bot, message) {
 });
 
 controller.hears('remove option (.*)', 'direct_message', function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users.hasOwnProperty(message.user)) {
-         poll.removeOption(message);
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
+         poll.removeOption(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to remove a poll option.");
       }
@@ -114,8 +107,8 @@ controller.hears('options', 'direct_message', function(bot, message) {
 });
 
 controller.hears('start poll', ['direct_mention', 'mention'], function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users.hasOwnProperty(message.user)) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
          poll.start();
       } else {
          bot.reply(message, "Sorry, you are not authorized to launch a poll.");
@@ -134,8 +127,8 @@ controller.hears('vote (.*)', 'direct_message', function(bot, message) {
 });
 
 controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention'], function(bot, message) {
-   controller.storage.teams.get('admins', function(err, data) {
-      if (data.users.hasOwnProperty(message.user)) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
          poll.close();
       } else {
          bot.reply(message, "Sorry, you are not authorized to close a poll.");

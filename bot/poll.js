@@ -6,15 +6,15 @@ function poll(controller, bot) {
    this.start = function () {
       var date = new Date(),
       team = {id: 'users', list:{}};
-      controller.storage.teams.get('options', function(err, data) {
-         if (helper.isEmpty(data.list)) {
+      controller.storage.teams.get('settings', function(err, data) {
+         if (helper.isEmpty(data.options)) {
             bot.sendWebhook({text: "You should probably add options to vote for before you start the poll!"});
             return;
          }
          var optionsList = {},
          num = 1;
-         for (var option in data.list) {
-            optionsList[num] = {name: data.list[option].name, count: 0};
+         for (var option in data.options) {
+            optionsList[num] = {name: data.options[option].name, count: 0};
             num++;
          }
          controller.storage.teams.save(
@@ -28,11 +28,11 @@ function poll(controller, bot) {
          bot.sendWebhook({text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:"});
 
          bot.api.users.list({}, function(err, response) {
-            controller.storage.teams.get('options', function(err, data) {
+            controller.storage.teams.get('settings', function(err, data) {
                var options = '',
                num = 1;
-               for (var option in data.list) {
-                  options = options.concat("\n" + num + ") " + data.list[option].name);
+               for (var option in data.options) {
+                  options = options.concat("\n" + num + ") " + data.options[option].name);
                   num++;
                }
                msgUsers(response, options);
@@ -120,15 +120,15 @@ function poll(controller, bot) {
    }
 
    this.list = function (message) {
-      controller.storage.teams.get('options', function(err, data) {
-         if (helper.isEmpty(data.list)) {
+      controller.storage.teams.get('settings', function(err, data) {
+         if (helper.isEmpty(data.options)) {
             bot.reply(message, "There are currently no options.");
             return;
          }
          var options = '',
          num = 1;
-         for (var option in data.list) {
-            options = options.concat("\n" + num + ") " + data.list[option].name);
+         for (var option in data.options) {
+            options = options.concat("\n" + num + ") " + data.options[option].name);
             num++;
          }
          bot.reply(message, "*Here are the poll options:*" + options);
@@ -179,40 +179,37 @@ function poll(controller, bot) {
       });
    }
 
-   this.addOption = function (message) {
-      controller.storage.teams.get('options', function(err, data) {
-         if (helper.isEmpty(data.list)) {
-            data.list['1'] = {name: message.match[1]};
+   this.addOption = function (message, data) {
+         if (helper.isEmpty(data.options)) {
+            data.options['1'] = {name: message.match[1]};
          } else {
             var addOption = message.match[1].toLowerCase(),
             dup = false;
-            for (var option in data.list) {
-               if (addOption === data.list[option].name.toLowerCase()) {
+            for (var option in data.options) {
+               if (addOption === data.options[option].name.toLowerCase()) {
                   dup = true;
                   bot.reply(message, "*" + message.match[1] + "* has already been added!");
                   break;
                }
             }
             if (!dup) {
-               var highest = Object.keys(data.list).pop();
+               var highest = Object.keys(data.options).pop();
                highest = parseInt(highest) + 1;
-               data.list[highest.toString()] = {name: message.match[1]};
+               data.options[highest.toString()] = {name: message.match[1]};
             }
          }
          controller.storage.teams.save(data, function(err, id) {
             bot.reply(message, "Successfully saved *" + message.match[1] + "* as a poll option.");
             self.list(message);
          });
-      });
    }
 
-   this.removeOption = function (message) {
-      controller.storage.teams.get('options', function(err, data) {
+   this.removeOption = function (message, data) {
          var remOption = message.match[1].toLowerCase(),
          deleted = false;
-         for (var option in data.list) {
-            if (remOption === data.list[option].name.toLowerCase()) {
-               delete data.list[option];
+         for (var option in data.options) {
+            if (remOption === data.options[option].name.toLowerCase()) {
+               delete data.options[option];
                deleted = true;
             }
          }
@@ -224,7 +221,6 @@ function poll(controller, bot) {
          } else {
             bot.reply(message, "Sorry, but I couldn't find *" + message.match[1] + "* in the list of poll options.");
          }
-      });
    }
 }
 
