@@ -4,8 +4,13 @@ function poll(controller, bot) {
    var self = this;
 
    this.start = function () {
-      var date = new Date();
+      var date = new Date(),
+      team = {id: 'users', list:{}};
       controller.storage.teams.get('options', function(err, data) {
+         if (helper.isEmpty(data.list)) {
+            bot.sendWebhook({text: "You should probably add options to vote for before you start the poll!"});
+            return;
+         }
          var optionsList = {},
          num = 1;
          for (var option in data.list) {
@@ -19,22 +24,29 @@ function poll(controller, bot) {
             status: 'open',
             options: optionsList
          });
-      });
 
-      bot.sendWebhook({text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:"});
+         bot.sendWebhook({text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:"});
 
-      var team = {id: 'users', list:{}};
-      bot.api.users.list({}, function(err, response) {
-         controller.storage.teams.get('options', function(err, data) {
-            var options = '',
-            num = 1;
-            for (var option in data.list) {
-               options = options.concat("\n" + num + ") " + data.list[option].name);
-               num++;
-            }
-            msgUsers(response, options);
+         bot.api.users.list({}, function(err, response) {
+            controller.storage.teams.get('options', function(err, data) {
+               var options = '',
+               num = 1;
+               for (var option in data.list) {
+                  options = options.concat("\n" + num + ") " + data.list[option].name);
+                  num++;
+               }
+               msgUsers(response, options);
+            });
+            controller.storage.teams.save(team);
          });
-         controller.storage.teams.save(team);
+
+         setTimeout(function() {
+            controller.storage.teams.get('pollSave', function(err, data) {
+               if (data['status'] === 'open') {
+                  self.close();
+               }
+            });
+         }, 2 * 3600000);
       });
 
       msgUsers = function(res, options) {
@@ -48,27 +60,19 @@ function poll(controller, bot) {
             }
          }
       }
-
-      setTimeout(function() {
-         controller.storage.teams.get('pollSave', function(err, data) {
-            if (data['status'] === 'open') {
-               self.close();
-            }
-         });
-      }, 2 * 3600000);
    }
 
-   this.close = function () {
+   this.close = function (data) {
       controller.storage.teams.get('pollSave', function(err, data) {
-         if (data.status === 'closed') {
-            bot.sendWebhook({text: "The poll is already closed!"});
-         } else {
-            data['status'] = 'closed';
-            var winner = winningOption(data);
-            data['winner'] = winner['name'][0];
-            bot.sendWebhook({text: "The lunch poll is now closed.\n:tada: The winner is *" + winner['name'][0] + "* with " + winner['votes'] + " votes! :tada:"});
-            controller.storage.teams.save(data);
+         if (err || data.status === 'closed') {
+            bot.reply(message, "There is no open poll!");
+            return;
          }
+         data['status'] = 'closed';
+         var winner = winningOption(data);
+         data['winner'] = winner['name'][0];
+         bot.sendWebhook({text: "The lunch poll is now closed.\n:tada: The winner is *" + winner['name'][0] + "* with " + winner['votes'] + " votes! :tada:"});
+         controller.storage.teams.save(data);
       });
    }
 
@@ -117,6 +121,10 @@ function poll(controller, bot) {
 
    this.list = function (message) {
       controller.storage.teams.get('options', function(err, data) {
+         if (helper.isEmpty(data.list)) {
+            bot.reply(message, "There are currently no options.");
+            return;
+         }
          var options = '',
          num = 1;
          for (var option in data.list) {
@@ -155,6 +163,10 @@ function poll(controller, bot) {
    this.userStatus = function(message) {
       var notAttend = '', noAnswer = '';
       controller.storage.teams.get('users', function(err, data) {
+         if (err) {
+            bot.reply(message, "There is no poll open to view the user status of.");
+            return;
+         }
          for (var id in data.list) {
             var name = data.list[id].name.split(" ");
             if (data.list[id].vote === '' && noAnswer === '') {

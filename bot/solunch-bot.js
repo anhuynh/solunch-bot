@@ -125,10 +125,10 @@ controller.hears('start poll', ['direct_mention', 'mention'], function(bot, mess
 
 controller.hears('vote (.*)', 'direct_message', function(bot, message) {
    controller.storage.teams.get('pollSave', function(err, data) {
-      if (data['status'] === 'open') {
-         poll.processVote(message, data);
+      if (err || data.status === 'closed') {
+         bot.reply(message, "Sorry, but the poll is closed. :sleeping:");
       } else {
-         bot.reply(message, "Sorry, but the poll is now closed. :sleeping:");
+         poll.processVote(message, data);
       }
    });
 });
@@ -145,7 +145,11 @@ controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'me
 
 controller.hears('status', 'direct_message', function(bot, message) {
    controller.storage.teams.get('pollSave', function(err, data) {
-      poll.status(message, data);
+      if (err) {
+         bot.reply(message, "Sorry, there is no poll to view the status of.");
+      } else {
+         poll.status(message, data);
+      }
    });
 });
 
@@ -155,8 +159,8 @@ controller.hears('status', 'direct_message', function(bot, message) {
 var commands = "Here is a list of my commands:\n`status`: view the current status of the poll\n`options`: view valid options for voting\n`vote `: submit a vote using the name or number for an option\n";
 
 controller.hears(['hello','hi','hey', 'good day sir'], 'direct_message', function(bot, message) {
-   controller.storage.teams.get('users', function(err, user_data) {
-      bot.reply(message, "Hey there " + user_data.list[message.user].name.split(" ")[0] + "! " + commands);
+   bot.api.users.info({user: message.user}, function(err, response) {
+      bot.reply(message, "Hey there " + response.user.profile.first_name + "! " + commands);
    });
 });
 

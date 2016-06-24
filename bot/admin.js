@@ -45,7 +45,10 @@ function admins(controller, bot) {
 
 	this.list = function(message) {
 		controller.storage.teams.get('admins', function(err, data) {
-		   if (data.users.hasOwnProperty(message.user)) {
+			if (helper.isEmpty(data.users)) {
+				bot.reply(message, "There are currently no admins.");
+				return;
+			} else if (data.users.hasOwnProperty(message.user)) {
 		      var userList = '';
 		      for (var id in data.users) {
 		         if (userList === '') {
