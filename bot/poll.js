@@ -11,10 +11,12 @@ function poll(controller, bot) {
             bot.sendWebhook({text: "You should probably add options to vote for before you start the poll!"});
             return;
          }
-         var optionsList = {},
+         var optionsSave = {},
+         optionsList = '',
          num = 1;
          for (var option in data.options) {
-            optionsList[num] = {name: data.options[option].name, count: 0};
+            optionsSave[num] = {name: data.options[option].name, count: 0};
+            optionsList = optionsList.concat("\n" + num + ") " + data.options[option].name);
             num++;
          }
          controller.storage.teams.save(
@@ -22,22 +24,17 @@ function poll(controller, bot) {
             id: 'pollSave',
             date: date.getMonth() + "-" + date.getDate(),
             status: 'open',
-            options: optionsList
+            options: optionsSave,
+            users: {}
          });
 
          bot.sendWebhook({text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:"});
 
          bot.api.users.list({}, function(err, response) {
-            controller.storage.teams.get('settings', function(err, data) {
-               var options = '',
-               num = 1;
-               for (var option in data.options) {
-                  options = options.concat("\n" + num + ") " + data.options[option].name);
-                  num++;
-               }
-               msgUsers(response, options);
+            controller.storage.teams.get('pollSave', function(err, data) {
+               msgUsers(response, data, optionsList);
+               controller.storage.teams.save(data);
             });
-            controller.storage.teams.save(team);
          });
 
          setTimeout(function() {
@@ -49,10 +46,10 @@ function poll(controller, bot) {
          }, 2 * 3600000);
       });
 
-      msgUsers = function(res, options) {
+      msgUsers = function(res, data, options) {
          for (var i = 0; i < res.members.length; i++) {
             if (res.members[i].deleted == false && res.members[i].is_bot == false && res.members[i].name !== "slackbot") {
-               team.list[res.members[i].id] = {name: res.members[i].real_name, vote: ''};
+               data.users[res.members[i].id] = {name: res.members[i].real_name, vote: ''};
                bot.startPrivateConversation({'user': res.members[i].id}, function(err, convo) {
                   convo.say("Hey! It's time to submit your vote for Friday's lunch!\n*Here are the poll options:*" + options + "\nWhenever you're ready, submit a vote by typing `vote` and then the name or number of an option. Ask for help if you need more assistance!");
                   convo.next();
@@ -99,10 +96,9 @@ function poll(controller, bot) {
    }
 
    submit = function (message, data, vote) {
-      controller.storage.teams.get('users', function(err, user_data) {
-         var name = user_data.list[message.user].name;
-         if (user_data.list[message.user].vote !== '') {
-            var previousVote = user_data.list[message.user].vote;
+         var name = data.users[message.user].name;
+         if (data.users[message.user].vote !== '') {
+            var previousVote = data.users[message.user].vote;
             data.options[previousVote].count--;
             data.options[vote].count++;
             bot.reply(message, "Thanks for revoting, " + name.split(" ")[0] +". You previously voted for: *" + data.options[previousVote].name +
@@ -113,10 +109,8 @@ function poll(controller, bot) {
             bot.reply(message, "Thanks for voting, " + name.split(" ")[0] + ". You voted for: *" + data.options[vote].name +
                "*\nFeel free to vote again to change your vote. To see more commands, ask for help!");
          }
-         user_data.list[message.user].vote = vote;
+         data.users[message.user].vote = vote;
          controller.storage.teams.save(data);
-         controller.storage.teams.save(user_data);
-      });
    }
 
    this.list = function (message) {
@@ -162,16 +156,16 @@ function poll(controller, bot) {
 
    this.userStatus = function(message) {
       var notAttend = '', noAnswer = '';
-      controller.storage.teams.get('users', function(err, data) {
+      controller.storage.teams.get('pollSave', function(err, data) {
          if (err) {
             bot.reply(message, "There is no poll open to view the user status of.");
             return;
          }
-         for (var id in data.list) {
-            var name = data.list[id].name.split(" ");
-            if (data.list[id].vote === '' && noAnswer === '') {
+         for (var id in data.users) {
+            var name = data.users[id].name.split(" ");
+            if (data.users[id].vote === '' && noAnswer === '') {
                noAnswer = name[0] + " " + name[1][0] + ".";
-            } else if(data.list[id].vote === '') {
+            } else if(data.users[id].vote === '') {
                noAnswer = noAnswer.concat(", " + name[0] + " " + name[1][0] + ".");
             }
          }
