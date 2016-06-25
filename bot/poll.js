@@ -182,6 +182,7 @@ function poll(controller, bot) {
    this.addOption = function (message, data) {
          if (helper.isEmpty(data.options)) {
             data.options['1'] = {name: message.match[1]};
+            saveOption(message, data, 'added');
          } else {
             var addOption = message.match[1].toLowerCase(),
             dup = false;
@@ -196,12 +197,9 @@ function poll(controller, bot) {
                var highest = Object.keys(data.options).pop();
                highest = parseInt(highest) + 1;
                data.options[highest.toString()] = {name: message.match[1]};
+               saveOption(message, data, 'added');
             }
          }
-         controller.storage.teams.save(data, function(err, id) {
-            bot.reply(message, "Successfully saved *" + message.match[1] + "* as a poll option.");
-            self.list(message);
-         });
    }
 
    this.removeOption = function (message, data) {
@@ -214,13 +212,17 @@ function poll(controller, bot) {
             }
          }
          if (deleted) {
-            controller.storage.teams.save(data, function(err, id) {
-               bot.reply(message, "Successfully deleted *" + message.match[1] + "* from poll options.");
-               self.list(message);
-            });
+            saveOption(message, data, 'removed');
          } else {
             bot.reply(message, "Sorry, but I couldn't find *" + message.match[1] + "* in the list of poll options.");
          }
+   }
+
+   saveOption = function(message, data, action) {
+      controller.storage.teams.save(data, function(err, id) {
+         bot.reply(message, "Successfully " + action + " *" + message.match[1] + "*.");
+         self.list(message);
+      });
    }
 }
 
