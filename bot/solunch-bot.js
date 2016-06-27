@@ -106,7 +106,7 @@ controller.hears('options', 'direct_message', function(bot, message) {
    poll.list(message);
 });
 
-controller.hears('start poll', ['direct_mention', 'mention'], function(bot, message) {
+controller.hears('start poll', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          poll.start();
@@ -126,7 +126,7 @@ controller.hears('vote (.*)', 'direct_message', function(bot, message) {
    });
 });
 
-controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention'], function(bot, message) {
+controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          poll.close();

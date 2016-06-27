@@ -61,7 +61,7 @@ Note that if you want to add yourself as an admin, you won't be able to use auto
 
 ### Poll Commands
 
-**The folowing must be called in the channel that the bot is in by direct mentioning the bot before the command:**
+**The folowing can be used in the channel that the bot is in by direct mentioning the bot before the command or by direct messaging the bot:**
 
 `start poll`: Launches the lunch poll which will have the bot direct message all users (**admins only**).
 
