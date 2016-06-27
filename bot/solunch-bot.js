@@ -152,7 +152,7 @@ controller.hears('vote (.*)', 'direct_message', function(bot, message) {
 controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
-         poll.close();
+         poll.close(message);
       } else {
          bot.reply(message, "Sorry, you are not authorized to close a poll.");
       }

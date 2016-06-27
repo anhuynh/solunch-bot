@@ -59,7 +59,7 @@ function poll(controller, bot) {
       }
    }
 
-   this.close = function (data) {
+   this.close = function (message) {
       controller.storage.teams.get('pollSave', function(err, data) {
          if (err || data.status === 'closed') {
             bot.reply(message, "There is no open poll!");
