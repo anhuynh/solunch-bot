@@ -109,7 +109,30 @@ controller.hears('options', 'direct_message', function(bot, message) {
 controller.hears('start poll', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
-         poll.start();
+         controller.storage.teams.get('pollSave', function(err, pollData) {
+            if (pollData == null || pollData.status === 'closed') {
+               poll.start();
+            } else {
+               bot.startConversation(message, function(err, convo) {
+                  convo.ask("The poll is already open. If you start a new one, the data from the previous poll will be reset! Are you sure you want to start a new poll?", [
+                     {
+                        pattern: bot.utterances.yes,
+                        callback: function(response, convo) {
+                           poll.start();
+                           convo.next();
+                        }
+                     },
+                     {
+                        pattern: bot.utterances.no,
+                        callback: function(response, convo){
+                           convo.say("Ok, the current poll is still running.");
+                           convo.next();
+                        }
+                     }
+                  ]);
+               });
+            }
+         });
       } else {
          bot.reply(message, "Sorry, you are not authorized to launch a poll.");
       }
