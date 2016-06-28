@@ -111,7 +111,7 @@ controller.hears('start poll', ['direct_mention', 'mention', 'direct_message'], 
       if (data.admins.hasOwnProperty(message.user)) {
          controller.storage.teams.get('pollSave', function(err, pollData) {
             if (pollData == null || pollData.status === 'closed') {
-               poll.start();
+               poll.start(message);
             } else {
                bot.startConversation(message, function(err, convo) {
                   convo.ask("The poll is already open. If you start a new one, the data from the previous poll will be reset! Are you sure you want to start a new poll?", [

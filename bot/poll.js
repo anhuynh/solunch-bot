@@ -3,12 +3,12 @@ var helper = require('./helpers.js');
 function poll(controller, bot) {
    var self = this;
 
-   this.start = function () {
+   this.start = function (message) {
       var date = new Date(),
       team = {id: 'users', list:{}};
       controller.storage.teams.get('settings', function(err, data) {
          if (helper.isEmpty(data.options)) {
-            bot.sendWebhook({text: "You should probably add options to vote for before you start the poll!"});
+            bot.reply(message, "You should probably add options to vote for before you start the poll!");
             return;
          }
          var optionsSave = {},
