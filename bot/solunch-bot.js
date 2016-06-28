@@ -182,16 +182,25 @@ controller.hears('status', 'direct_message', function(bot, message) {
 //*****************************************************************************************************************************//
 //                                                          CHAT STUFFS                                                        //
 //*****************************************************************************************************************************//
-var commands = "Here is a list of my commands:\n`status`: view the current status of the poll\n`options`: view valid options for voting\n`vote `: submit a vote using the name or number for an option\n";
 
 controller.hears(['hello','hi','hey', 'good day sir'], 'direct_message', function(bot, message) {
    bot.api.users.info({user: message.user}, function(err, response) {
-      bot.reply(message, "Hey there " + response.user.profile.first_name + "! " + commands);
+      bot.reply(message, "Hey there " + response.user.profile.first_name + "!");
    });
 });
 
 controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bot, message) {
-   bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
+   controller.storage.teams.get('settings', function(err, data) {
+      var commands = "Here is a list of my commands:\n`status`: view the current status of the poll\n`options`: view valid options for voting\n`vote `: submit a vote using the name or number for an option\n";
+      if (data.admins.hasOwnProperty(message.user)) {
+         commands = commands.concat("\n*Admin Commands*:\n");
+         if (data.admins[message.user].hasOwnProperty('super')) {
+            commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n");
+         }
+         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`start poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
+      }
+      bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
+   });
 });
 
 controller.hears('who is your creator', ['direct_message', 'direct_mention'], function(bot, message) {
@@ -199,5 +208,5 @@ controller.hears('who is your creator', ['direct_message', 'direct_mention'], fu
 });
 
 controller.hears('(.*)', 'direct_message', function(bot, message) {
-   bot.reply(message, "Sorry, I don't understand. " + commands);
+   bot.reply(message, "Sorry, but I'm not much of a conversationalist. Ask for help if you want a list of my commands!");
 });
