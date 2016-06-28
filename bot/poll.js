@@ -59,11 +59,13 @@ function poll(controller, bot) {
       }
    }
 
-   this.close = function (message) {
+   this.close = function (message, dm) {
       controller.storage.teams.get('pollSave', function(err, data) {
          if (err || data.status === 'closed') {
             bot.reply(message, "There is no open poll!");
             return;
+         } else if(dm) {
+            bot.reply(message, "Closing poll...");
          }
          data['status'] = 'closed';
          var winner = winningOption(data);

@@ -149,7 +149,17 @@ controller.hears('vote (.*)', 'direct_message', function(bot, message) {
    });
 });
 
-controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['close poll', 'end poll', 'stop poll'], 'direct_message', function(bot, message) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
+         poll.close(message, true);
+      } else {
+         bot.reply(message, "Sorry, you are not authorized to close a poll.");
+      }
+   });
+});
+
+controller.hears(['close poll', 'end poll', 'stop poll'], ['direct_mention', 'mention'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          poll.close(message);
