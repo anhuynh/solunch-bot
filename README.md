@@ -57,7 +57,7 @@ Note that if you want to add yourself as an admin, you won't be able to use auto
 
 `list admins`: Gives a list of current admins.
 
-`user status`: Lists the status of the poll. Displays users that have not answered or have answered that they are not attending.
+`user status`: Lists the users that have not answered the poll.
 
 ### Poll Commands
 
