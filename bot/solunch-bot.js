@@ -4,6 +4,7 @@ require('dotenv').config();
 var pollFunctions = require('./poll.js');
 var adminFunctions = require('./admin.js');
 var helper = require('./helpers.js');
+var scheduler = true;
 
 if (!process.env.token) {
    console.log('Error: Specify token in environment');
@@ -95,11 +96,32 @@ controller.hears('remove option (.*)', 'direct_message', function(bot, message) 
    });
 });
 
+controller.hears('cancel poll', 'direct_message', function(bot, message) {
+   var date = new Date();
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
+         if (date.getDay() == 4 && date.getHours() <= 10 && date.getMinutes() < 30) {
+            scheduler = false;
+            bot.reply(message, "The poll scheduled today is now cancelled. The poll will run as normal next week.");
+            setTimeout(function() {
+               scheduler = true;
+            }, 24 * 3600000);
+         } else {
+            bot.reply(message, "The poll is not scheduled for today.");
+         }
+      } else {
+         bot.reply(message, "Sorry, you are not authorized to cancel the poll.");
+      }
+   });
+});
+
 //*****************************************************************************************************************************//
 //                                                          POLL STUFFS                                                        //
 //*****************************************************************************************************************************//
-schedule.scheduleJob({hour: 10, minute: 0, dayOfWeek: 4}, function() {
-   poll.start();
+schedule.scheduleJob({hour: 10, minute: 30, dayOfWeek: 4}, function() {
+   if (scheduler) {
+      poll.start();
+   }
 });
 
 controller.hears('options', 'direct_message', function(bot, message) {
