@@ -138,7 +138,7 @@ controller.hears('options', 'direct_message', function(bot, message) {
    poll.list(message);
 });
 
-controller.hears('start poll', ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['start poll', 'begin poll', 'open poll'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          controller.storage.teams.get('pollSave', function(err, pollData) {
@@ -146,7 +146,7 @@ controller.hears('start poll', ['direct_mention', 'mention', 'direct_message'], 
                poll.start(message);
             } else {
                bot.startConversation(message, function(err, convo) {
-                  convo.ask("The poll is already open. If you start a new one, the data from the previous poll will be reset! Are you sure you want to start a new poll?", [
+                  convo.ask("The poll is already open. If you start a new one, the data from the previous poll will be reset! *Are you sure you want to start a new poll?*", [
                      {
                         pattern: bot.utterances.yes,
                         callback: function(response, convo) {
