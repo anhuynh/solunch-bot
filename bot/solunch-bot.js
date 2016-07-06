@@ -229,6 +229,10 @@ controller.hears('who is your creator', ['direct_message', 'direct_mention'], fu
    bot.reply(message, 'An is my creator!');
 });
 
+controller.hears('joke', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+   bot.reply(message, helper.random('jokes'));
+});
+
 controller.hears('(.*)', 'direct_message', function(bot, message) {
    bot.reply(message, "Sorry, but I'm not much of a conversationalist. Ask for help if you want a list of my commands!");
 });
