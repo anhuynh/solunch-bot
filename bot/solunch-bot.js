@@ -205,10 +205,9 @@ controller.hears('status', 'direct_message', function(bot, message) {
 //*****************************************************************************************************************************//
 //                                                          CHAT STUFFS                                                        //
 //*****************************************************************************************************************************//
-
 controller.hears(['hello','hi','hey', 'good day sir'], 'direct_message', function(bot, message) {
    bot.api.users.info({user: message.user}, function(err, response) {
-      bot.reply(message, "Hey there " + response.user.profile.first_name + "!");
+      bot.reply(message, helper.random('greetings') + response.user.profile.first_name + "!");
    });
 });
 

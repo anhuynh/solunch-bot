@@ -16,7 +16,16 @@ shuffleArray = function(array) {
     return array;
 }
 
+var greetings = ['Hello ', 'Greetings ', 'Hey there ', 'Hi '];
+
+random = function(type) {
+    type = greetings;
+
+    shuffleArray(type);
+    return type[0];
+}
 module.exports = {
     isEmpty: isEmpty,
-    shuffleArray: shuffleArray
+    shuffleArray: shuffleArray,
+    random: random
 };
