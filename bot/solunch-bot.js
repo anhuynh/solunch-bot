@@ -18,8 +18,7 @@ var controller = Botkit.slackbot({
 });
 
 var bot = controller.spawn({
-   token: process.env.token,
-   incoming_webhook: {url: process.env['webhook']}
+   token: process.env.token
 }).startRTM(function(err) {
    if (err) {
       throw new Error(err);
@@ -31,7 +30,7 @@ admin = new adminFunctions(controller, bot);
 
 controller.storage.teams.get('settings', function(err, data){
    if (data == null) {
-      controller.storage.teams.save({id: 'settings', admins: {}, options: {}});
+      controller.storage.teams.save({id: 'settings', channel: "", admins: {}, options: {}});
       console.log("Created settings file");
    }
 });
@@ -65,6 +64,16 @@ controller.hears('remove admin (.*)', 'direct_message', function(bot, message) {
 
 controller.hears('list admins', 'direct_message', function(bot, message) {
    admin.list(message);
+});
+
+controller.hears('set channel (.*)', 'direct_message', function(bot, message) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins.hasOwnProperty(message.user)) {
+         poll.setChannel(message, data);
+      } else {
+         bot.reply(message, "Sorry, you are not authorized to set the poll channel.");
+      }
+   });
 });
 
 controller.hears('user status', 'direct_message', function(bot, message) {
@@ -219,7 +228,7 @@ controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bo
          if (data.admins[message.user].hasOwnProperty('super')) {
             commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n");
          }
-         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`start poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
+         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`set channel #channel`: sets the announcement location for the poll\n`start poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
       }
       bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
    });

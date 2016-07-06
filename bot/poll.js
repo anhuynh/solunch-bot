@@ -28,7 +28,12 @@ function poll(controller, bot) {
             users: {}
          });
 
-         bot.sendWebhook({text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:"});
+         bot.say(
+            {
+               text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:",
+               channel: data.channel
+            }
+         );
 
          bot.api.users.list({}, function(err, response) {
             controller.storage.teams.get('pollSave', function(err, data) {
@@ -60,18 +65,25 @@ function poll(controller, bot) {
    }
 
    this.close = function (message, dm) {
-      controller.storage.teams.get('pollSave', function(err, data) {
-         if (err || data.status === 'closed') {
+      controller.storage.teams.get('pollSave', function(err, pollData) {
+         if (err || pollData.status === 'closed') {
             bot.reply(message, "There is no open poll!");
             return;
          } else if(dm) {
             bot.reply(message, "Closing poll...");
          }
-         data['status'] = 'closed';
-         var winner = winningOption(data);
-         data['winner'] = winner['name'][0];
-         bot.sendWebhook({text: "The lunch poll is now closed.\n:tada: The winner is *" + winner['name'][0] + "* with " + winner['votes'] + " votes! :tada:"});
-         controller.storage.teams.save(data);
+         controller.storage.teams.get('settings', function(err, data) {
+            pollData['status'] = 'closed';
+            var winner = winningOption(pollData);
+            pollData['winner'] = winner['name'][0];
+            bot.say(
+               {
+                  text: "The lunch poll is now closed.\n:tada: The winner is *" + winner['name'][0] + "* with " + winner['votes'] + " votes! :tada:",
+                  channel: data.channel
+               }
+            );
+            controller.storage.teams.save(pollData);
+         });
       });
    }
 
@@ -154,6 +166,22 @@ function poll(controller, bot) {
          status = status.concat("\nCurrently in the lead: *" + winning['name'] + "*");
       }
       bot.reply(message, {text: status + '\n*Here are the current results:* ' + results});
+   }
+
+   this.setChannel = function(message, data) {
+      if (message.match[1][0] == "<" && message.match[1][1] == "#"){
+         var channel = message.match[1].split('<')[1].split('#')[1].split('>')[0];
+         if (data.channel === channel) {
+            bot.reply(message, "That channel has already been set as the poll announcement channel!");
+         } else {
+            data.channel = channel;
+            controller.storage.teams.save(data, function(err, id) {
+               bot.reply(message, "Successfully saved poll announcement channel.");
+            });
+         }
+      } else {
+         bot.reply(message, "Sorry, but that is not a valid channel. Use Slack's #channel to select a channel to use for poll announcements.");
+      }
    }
 
    this.userStatus = function(message) {
