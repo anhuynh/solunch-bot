@@ -239,6 +239,7 @@ controller.hears('who is your creator', ['direct_message', 'direct_mention'], fu
 });
 
 controller.hears('joke', ['direct_message', 'direct_mention', 'mention'], function(bot, message) {
+   bot.api.reactions.add({name: "stuck_out_tongue_closed_eyes", channel: message.channel, timestamp: message.ts});
    bot.reply(message, helper.random('jokes'));
 });
 

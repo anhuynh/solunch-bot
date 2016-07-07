@@ -123,6 +123,7 @@ function poll(controller, bot) {
             bot.reply(message, "Thanks for voting, " + name.split(" ")[0] + ". You voted for: *" + data.options[vote].name +
                "*\nFeel free to vote again to change your vote. To see more commands, ask for help!");
          }
+         bot.api.reactions.add({name: "+1", channel: message.channel, timestamp: message.ts});
          data.users[message.user].vote = vote;
          controller.storage.teams.save(data);
    }
