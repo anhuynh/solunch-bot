@@ -249,6 +249,19 @@ function poll(controller, bot) {
          self.list(message);
       });
    }
+
+   this.removeAllOptions = function(message, data) {
+      if (helper.isEmpty(data.options)) {
+         bot.reply(message, "There are no options to remove!");
+      } else {
+         for (var option in data.options) {
+            delete data.options[option];
+         }
+         controller.storage.teams.save(data, function(err, id) {
+            bot.reply(message, "Successfully removed all options.");
+         });
+      }
+   }
 }
 
 winningOption = function(data) {

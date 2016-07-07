@@ -106,6 +106,16 @@ controller.hears('remove option (.*)', 'direct_message', function(bot, message) 
    });
 });
 
+controller.hears('remove all options', 'direct_message', function(bot, message) {
+   controller.storage.teams.get('settings', function(err, data) {
+      if (data.admins[message.user].hasOwnProperty('super')) {
+         poll.removeAllOptions(message, data);
+      } else {
+         bot.reply(message, "Sorry, you are not authorized to remove options");
+      }
+   });
+});
+
 controller.hears('cancel poll', 'direct_message', function(bot, message) {
    var date = new Date();
    controller.storage.teams.get('settings', function(err, data) {
