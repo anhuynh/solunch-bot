@@ -109,7 +109,24 @@ controller.hears('remove option (.*)', 'direct_message', function(bot, message) 
 controller.hears('remove all options', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins[message.user].hasOwnProperty('super')) {
-         poll.removeAllOptions(message, data);
+         bot.startConversation(message, function(err, convo) {
+            convo.ask("Are you sure you want to remove *all* options?", [
+               {
+                  pattern: bot.utterances.yes,
+                  callback: function(response, convo) {
+                     poll.removeAllOptions(message, data);
+                     convo.next();
+                  }
+               },
+               {
+                  pattern: bot.utterances.no,
+                  callback: function(response, convo){
+                     convo.say("Ok, nothing was deleted.");
+                     convo.next();
+                  }
+               }
+            ]);
+         });
       } else {
          bot.reply(message, "Sorry, you are not authorized to remove options");
       }
@@ -236,9 +253,9 @@ controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bo
       if (data.admins.hasOwnProperty(message.user)) {
          commands = commands.concat("\n*Admin Commands*:\n");
          if (data.admins[message.user].hasOwnProperty('super')) {
-            commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n");
+            commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n`remove all options`: removes all options from the list\n");
          }
-         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`set channel #channel`: sets the announcement location for the poll\n`start poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
+         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`set channel #channel`: sets the announcement location for the poll\n`start poll, begin poll, open poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
       }
       bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
    });
