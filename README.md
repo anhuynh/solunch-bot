@@ -67,7 +67,9 @@ Lastly, use `add option {OPTION}` and `remove option {OPTION}` to modify the lis
 
 `user status`: Lists the users that have not answered the poll.
 
-`set channel #{CHANNEL}`: Sets the specified channel as the announcment location for the poll starts and closes.
+`set channel #{CHANNEL}`: Sets the specified channel as the announcment location for the poll starts and closes (**super admin only**).
+
+`remove all options`: Deletes all options from the list (**super admin only**).
 
 ### Poll Commands
 
