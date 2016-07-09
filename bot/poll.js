@@ -30,7 +30,7 @@ function poll(controller, bot) {
 
          bot.say(
             {
-               text: "The lunch poll is now open!\nSolunch_bot should have sent you a message. If not, open a direct message with the bot to submit a vote.\nThe poll will automatically close in 2 hours. :timer_clock:",
+               text: "The lunch poll is now open!\nYou should have gotten a message from me. If not, just send me a direct message.\nThe poll will automatically close in 2 hours. :timer_clock:",
                channel: data.channel
             }
          );
