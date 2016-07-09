@@ -68,7 +68,7 @@ controller.hears('list admins', 'direct_message', function(bot, message) {
 
 controller.hears('set channel (.*)', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      if (data.admins.hasOwnProperty(message.user)) {
+      if (data.admins[message.user].hasOwnProperty('super')) {
          poll.setChannel(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to set the poll channel.");
@@ -253,9 +253,9 @@ controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bo
       if (data.admins.hasOwnProperty(message.user)) {
          commands = commands.concat("\n*Admin Commands*:\n");
          if (data.admins[message.user].hasOwnProperty('super')) {
-            commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n`remove all options`: removes all options from the list\n");
+            commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n`set channel #channel`: sets the announcement location for the poll\n`remove all options`: removes all options from the list\n");
          }
-         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`set channel #channel`: sets the announcement location for the poll\n`start poll, begin poll, open poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
+         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`start poll, begin poll, open poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
       }
       bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
    });
