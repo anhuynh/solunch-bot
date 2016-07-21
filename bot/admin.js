@@ -65,7 +65,7 @@ function admins(controller, bot) {
 	}
 
 	this.userAttendance = function() {
-		var team = {id: 'users', list:{}};
+		var team = {id: 'users', num: 0, list:{}};
 		bot.api.users.list({}, function(err, response) {
 			for (var i = 0; i < response.members.length; i++) {
 				if (response.members[i].deleted == false && response.members[i].is_bot == false && response.members[i].name !== "slackbot") {
@@ -78,6 +78,7 @@ function admins(controller, bot) {
 									convo.say("Awesome!");
 									controller.storage.teams.get('users', function(err, data) {
 										data.list[response.user].answered = true;
+										data.num++;
 										controller.storage.teams.save(data);
 									});
 									convo.next();
@@ -122,7 +123,7 @@ function admins(controller, bot) {
 		         }
 		      }
 		   };
-		   bot.reply(message, "*Here are the users that will not be attending:*\n" + notAttend + "\n*Here are the users that have not answered:*\n" + noAnswer);
+		   bot.reply(message, "*Here are the users that will not be attending:*\n" + notAttend + "\n*Here are the users that have not answered:*\n" + noAnswer + "\n*Total attending:* " + data.num);
 		});
 	}
 }
