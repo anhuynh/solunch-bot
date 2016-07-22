@@ -44,7 +44,9 @@ controller.hears(['are you there'], ['direct_message','direct_mention','mention'
 //*****************************************************************************************************************************//
 controller.hears('add admin (.*)', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      if (helper.isEmpty(data.admins) || data.admins[message.user].hasOwnProperty('super')) {
+      if (helper.isEmpty(data.admins)) {
+         admin.add(message, data);
+      } else if (data.admins.hasOwnProperty(message.user) && data.admins[message.user].hasOwnProperty('super')) {
          admin.add(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to add admins.");
@@ -54,7 +56,7 @@ controller.hears('add admin (.*)', 'direct_message', function(bot, message) {
 
 controller.hears('remove admin (.*)', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      if (data.admins[message.user].hasOwnProperty('super')) {
+      if (data.admins.hasOwnProperty(message.user) && data.admins[message.user].hasOwnProperty('super')) {
          admin.remove(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to remove admins.");
@@ -68,7 +70,7 @@ controller.hears('list admins', 'direct_message', function(bot, message) {
 
 controller.hears('set channel (.*)', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      if (data.admins[message.user].hasOwnProperty('super')) {
+      if (data.admins.hasOwnProperty(message.user) && data.admins[message.user].hasOwnProperty('super')) {
          poll.setChannel(message, data);
       } else {
          bot.reply(message, "Sorry, you are not authorized to set the poll channel.");
@@ -108,7 +110,7 @@ controller.hears('remove option (.*)', 'direct_message', function(bot, message) 
 
 controller.hears('remove all options', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      if (data.admins[message.user].hasOwnProperty('super')) {
+      if (data.admins.hasOwnProperty(message.user) && data.admins[message.user].hasOwnProperty('super')) {
          bot.startConversation(message, function(err, convo) {
             convo.ask("Are you sure you want to remove *all* options?", [
                {
