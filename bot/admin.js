@@ -105,25 +105,35 @@ function admins(controller, bot) {
 	}
 
 	this.attendanceList = function (message) {
-		var notAttend = '', noAnswer = '';
+		var notAttend = '', noAnswer = '', attendance = '', answers = '';
 		controller.storage.teams.get('users', function(err, data) {
-		   for (var id in data.list) {
-		      var name = data.list[id].name.split(" ");
-		      if (data.list[id].attending == false) {
-		         if (notAttend === '') {
-		            notAttend = name[0] + " " + name[1][0] + ".";
-		         } else {
-		            notAttend = notAttend.concat(", " + name[0] + " " + name[1][0] + ".");
-		         }
-		      } else if (data.list[id].answered == false) {
-		         if (noAnswer === '') {
-		            noAnswer = name[0] + " " + name[1][0] + ".";
-		         } else {
-		            noAnswer = noAnswer.concat(", " + name[0] + " " + name[1][0] + ".");
-		         }
-		      }
-		   };
-		   bot.reply(message, "*Here are the users that will not be attending:*\n" + notAttend + "\n*Here are the users that have not answered:*\n" + noAnswer + "\n*Total attending:* " + data.num);
+			if (err) {
+				bot.reply(message, "There is not attendance.");
+				return;
+			}
+			for (var id in data.list) {
+				var name = data.list[id].name.split(" ");
+				if (data.list[id].attending == false) {
+					if (notAttend === '') {
+						notAttend = name[0] + " " + name[1][0] + ".";
+					} else {
+						notAttend = notAttend.concat(", " + name[0] + " " + name[1][0] + ".");
+					}
+				} else if (data.list[id].answered == false) {
+					if (noAnswer === '') {
+						noAnswer = name[0] + " " + name[1][0] + ".";
+					} else {
+						noAnswer = noAnswer.concat(", " + name[0] + " " + name[1][0] + ".");
+					}
+				}
+			};
+			if (notAttend !== '') {
+				attendance = "*Here are the users that will not be attending:*\n" + notAttend;
+			}
+			if (noAnswer !== '') {
+				answers = "\n*Here are the users that have not answered:*\n" + noAnswer;
+			}
+			bot.reply(message, attendance + answers + "\n*Total attending:* " + data.num);
 		});
 	}
 }

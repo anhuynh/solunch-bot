@@ -164,7 +164,7 @@ controller.hears('user attendance', 'direct_message', function(bot, message) {
    });
 });
 
-controller.hears('user list', 'direct_message', function(bot, message) {
+controller.hears('^attendance', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          admin.attendanceList(message);
