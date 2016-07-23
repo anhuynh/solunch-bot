@@ -65,7 +65,10 @@ function admins(controller, bot) {
 	}
 
 	this.userAttendance = function() {
-		var team = {id: 'users', num: 0, list:{}};
+		var date = new Date(),
+		month = date.getMonth() + 1;
+		date = month + "-" + date.getDate();
+		var team = {id: 'users', date: date, num: 0, list:{}};
 		bot.api.users.list({}, function(err, response) {
 			for (var i = 0; i < response.members.length; i++) {
 				if (response.members[i].deleted == false && response.members[i].is_bot == false && response.members[i].name !== "slackbot") {
@@ -128,12 +131,12 @@ function admins(controller, bot) {
 				}
 			};
 			if (notAttend !== '') {
-				attendance = "*Here are the users that will not be attending:*\n" + notAttend;
+				attendance = "\n*Here are the users that will not be attending:*\n" + notAttend;
 			}
 			if (noAnswer !== '') {
 				answers = "\n*Here are the users that have not answered:*\n" + noAnswer;
 			}
-			bot.reply(message, attendance + answers + "\n*Total attending:* " + data.num);
+			bot.reply(message, "*Date:* " + data.date + attendance + answers + "\n*Total attending:* " + data.num);
 		});
 	}
 }
