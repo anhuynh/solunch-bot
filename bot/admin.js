@@ -64,7 +64,7 @@ function admins(controller, bot) {
 		});
 	}
 
-	this.userAttendance = function(message) {
+	this.getAttendance = function(message) {
 		var date = new Date(),
 		month = date.getMonth() + 1;
 		day = date.getDate();
