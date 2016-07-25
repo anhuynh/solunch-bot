@@ -64,11 +64,45 @@ function admins(controller, bot) {
 		});
 	}
 
-	this.userAttendance = function() {
+	this.userAttendance = function(message) {
 		var date = new Date(),
 		month = date.getMonth() + 1;
-		date = month + "-" + date.getDate();
-		var team = {id: 'users', date: date, num: 0, list:{}};
+		day = date.getDate();
+		var team = {id: 'users', date: month + "-" + day, num: 0, list:{}};
+		controller.storage.teams.get('users', function(err, data) {
+			if (data) {
+				var month2 = data.date.split("-")[0],
+				day2 = data.date.split("-")[1];
+				if (month2 == month && day2 == day) {
+					bot.startConversation(message, function(err, convo) {
+						convo.ask("You've already taken lunch attendance today. Are you sure you want to do it again?", [
+							{
+								pattern: bot.utterances.yes,
+								callback: function(response, convo) {
+									convo.say("Messaging users...");
+									msgUsers(team);
+									convo.next();
+								}
+							},
+							{
+								pattern: bot.utterances.no,
+								callback: function(response, convo){
+									convo.say("Okay.");
+									convo.next();
+								}
+							}
+						]);
+					});
+				} else {
+					msgUsers(team);
+				}
+			} else {
+				msgUsers(team);
+			}
+		});
+	}
+
+	msgUsers = function (team) {
 		bot.api.users.list({}, function(err, response) {
 			for (var i = 0; i < response.members.length; i++) {
 				if (response.members[i].deleted == false && response.members[i].is_bot == false && response.members[i].name !== "slackbot") {

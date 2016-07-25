@@ -157,7 +157,7 @@ controller.hears('cancel poll', 'direct_message', function(bot, message) {
 controller.hears('user attendance', 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
-         admin.userAttendance();
+         admin.userAttendance(message);
       } else {
          bot.reply(message, "Sorry, you are not authorized to use this command.");
       }
