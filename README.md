@@ -71,6 +71,10 @@ Lastly, use `add option {OPTION}` and `remove option {OPTION}` to modify the lis
 
 `remove all options`: Deletes all options from the list (**super admin only**).
 
+`get attendance`: Messages all users to ask if they will be attending lunch.
+
+`attendance`: Lists users who are not attending lunch or who have not answered.
+
 ### Poll Commands
 
 **The folowing can be used in the channel that the bot is in by direct mentioning the bot before the command or by direct messaging the bot:**
