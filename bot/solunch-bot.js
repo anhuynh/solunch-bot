@@ -277,7 +277,7 @@ controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bo
          if (data.admins[message.user].hasOwnProperty('super')) {
             commands = commands.concat("`add admin @user`: grant admin priviledges to the user\n`remove admin @user`: revoke admin priviledges from user\n`set channel #channel`: sets the announcement location for the poll\n`remove all options`: removes all options from the list\n");
          }
-         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`start poll, begin poll, open poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n");
+         commands = commands.concat("`list admins`: gives list of current admins\n`user status`: lists users that have not voted yet in the poll\n`start poll, begin poll, open poll`: starts a new poll\n`close poll, end poll or stop poll`: closes current poll\n`add option <option>`: adds option to the list of options (uses capitalization from the typed option)\n`remove option <option>`: removes option from list of options (capitalization doesn't matter)\n`get attendance`: messages all users asking if they will be attending lunch\n`attendance`: lists users who are not attending and who have not answered\n");
       }
       bot.reply(message, commands + "If you need anymore assistance, please contact my creator.");
    });
