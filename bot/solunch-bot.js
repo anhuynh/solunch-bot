@@ -14,7 +14,7 @@ if (!process.env.token) {
 
 var controller = Botkit.slackbot({
    debug: false,
-   json_file_store: 'solunch-bot-storage'
+   json_file_store: 'bot/solunch-bot-storage'
 });
 
 var bot = controller.spawn({

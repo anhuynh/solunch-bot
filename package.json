@@ -2,8 +2,9 @@
   "name": "solunch-bot",
   "version": "1.0.0",
   "description": "A bot designed for Solink's Slack team to handle lunch polls.",
-  "main": "index.js",
+  "main": "bot/solunch-bot.js",
   "scripts": {
+    "start": "node bot/solunch-bot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,
