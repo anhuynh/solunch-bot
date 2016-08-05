@@ -1,10 +1,10 @@
-var Botkit = require('botkit');
-var schedule = require('node-schedule');
+const Botkit = require('botkit');
+const schedule = require('node-schedule');
 require('dotenv').config();
-var pollFunctions = require('./poll.js');
-var adminFunctions = require('./admin.js');
-var helper = require('./helpers.js');
-var scheduler = true,
+const pollFunctions = require('./poll.js');
+const adminFunctions = require('./admin.js');
+const helper = require('./helpers.js');
+let scheduler = true,
 scheduleTime = {day: 4, hour: 10, minute: 30};
 
 if (!process.env.token) {
@@ -12,12 +12,12 @@ if (!process.env.token) {
    process.exit(1);
 }
 
-var controller = Botkit.slackbot({
+const controller = Botkit.slackbot({
    debug: false,
    json_file_store: 'bot/solunch-bot-storage'
 });
 
-var bot = controller.spawn({
+const bot = controller.spawn({
    token: process.env.token
 }).startRTM(function(err) {
    if (err) {
@@ -25,7 +25,7 @@ var bot = controller.spawn({
    }
 });
 
-var poll = new pollFunctions(controller, bot),
+const poll = new pollFunctions(controller, bot),
 admin = new adminFunctions(controller, bot);
 
 controller.storage.teams.get('settings', function(err, data){
@@ -136,7 +136,7 @@ controller.hears('remove all options', 'direct_message', function(bot, message) 
 });
 
 controller.hears('cancel poll', 'direct_message', function(bot, message) {
-   var date = new Date();
+   const date = new Date();
    controller.storage.teams.get('settings', function(err, data) {
       if (data.admins.hasOwnProperty(message.user)) {
          if (date.getDay() == scheduleTime.day && date.getHours() <= scheduleTime.hour && date.getMinutes() < scheduleTime.minute) {
@@ -271,7 +271,7 @@ controller.hears(['hello','hi','hey', 'good day sir'], 'direct_message', functio
 
 controller.hears(['help', 'assist', 'assistance'], 'direct_message', function(bot, message) {
    controller.storage.teams.get('settings', function(err, data) {
-      var commands = "Here is a list of my commands:\n`status`: view the current status of the poll\n`options`: view valid options for voting\n`vote `: submit a vote using the name or number for an option\n";
+      let commands = "Here is a list of my commands:\n`status`: view the current status of the poll\n`options`: view valid options for voting\n`vote `: submit a vote using the name or number for an option\n";
       if (data.admins.hasOwnProperty(message.user)) {
          commands = commands.concat("\n*Admin Commands*:\n");
          if (data.admins[message.user].hasOwnProperty('super')) {

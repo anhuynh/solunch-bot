@@ -1,11 +1,11 @@
-var helper = require('./helpers.js');
+const helper = require('./helpers.js');
 
 function admins(controller, bot) {
-	var self = this;
+	const self = this;
 
 	this.add = function(message, data) {
 		if (message.match[1][0] == "<" && message.match[1][1] == "@"){
-		   var addUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
+		   const addUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
 		   if (data.admins.hasOwnProperty(addUser)) {
 		      bot.reply(message, "That user is already an admin!");
 		   } else {
@@ -28,7 +28,7 @@ function admins(controller, bot) {
 
 	this.remove = function(message, data) {
 		if (message.match[1][0] == "<" && message.match[1][1] == "@"){
-		   var remUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
+		   const remUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
 		   if (data.admins.hasOwnProperty(message.user)) {
 		      delete data.admins[remUser];
 		      controller.storage.teams.save(data, function(err, id) {
@@ -49,8 +49,8 @@ function admins(controller, bot) {
 				bot.reply(message, "There are currently no admins.");
 				return;
 			} else if (data.admins.hasOwnProperty(message.user)) {
-		      var userList = '';
-		      for (var id in data.admins) {
+		      let userList = '';
+		      for (let id in data.admins) {
 		         if (userList === '') {
 		            userList = data.admins[id].name;
 		         } else {
@@ -65,13 +65,13 @@ function admins(controller, bot) {
 	}
 
 	this.getAttendance = function(message) {
-		var date = new Date(),
+		const date = new Date(),
 		month = date.getMonth() + 1;
 		day = date.getDate();
-		var team = {id: 'users', date: month + "-" + day, num: 0, list:{}};
+		let team = {id: 'users', date: month + "-" + day, num: 0, list:{}};
 		controller.storage.teams.get('users', function(err, data) {
 			if (data) {
-				var month2 = data.date.split("-")[0],
+				let month2 = data.date.split("-")[0],
 				day2 = data.date.split("-")[1];
 				if (month2 == month && day2 == day) {
 					bot.startConversation(message, function(err, convo) {
@@ -104,7 +104,7 @@ function admins(controller, bot) {
 
 	msgUsers = function (team) {
 		bot.api.users.list({}, function(err, response) {
-			for (var i = 0; i < response.members.length; i++) {
+			for (let i = 0; i < response.members.length; i++) {
 				if (response.members[i].deleted == false && response.members[i].is_bot == false && response.members[i].name !== "slackbot") {
 					team.list[response.members[i].id] = {name: response.members[i].real_name, answered: false, attending: true};
 					bot.startPrivateConversation({'user': response.members[i].id}, function(err, convo) {
@@ -142,14 +142,14 @@ function admins(controller, bot) {
 	}
 
 	this.attendanceList = function (message) {
-		var notAttend = '', noAnswer = '', attendance = '', answers = '';
+		let notAttend = '', noAnswer = '', attendance = '', answers = '';
 		controller.storage.teams.get('users', function(err, data) {
 			if (err) {
 				bot.reply(message, "There is not attendance.");
 				return;
 			}
-			for (var id in data.list) {
-				var name = data.list[id].name.split(" ");
+			for (let id in data.list) {
+				let name = data.list[id].name.split(" ");
 				if (data.list[id].attending == false) {
 					if (notAttend === '') {
 						notAttend = name[0] + " " + name[1][0] + ".";
