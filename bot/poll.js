@@ -110,22 +110,22 @@ function poll(controller, bot) {
    }
 
    submit = function (message, data, vote) {
-         const name = data.users[message.user].name;
-         if (data.users[message.user].vote !== '') {
-            let previousVote = data.users[message.user].vote;
-            data.options[previousVote].count--;
-            data.options[vote].count++;
-            bot.reply(message, "Thanks for revoting, " + name.split(" ")[0] +". You previously voted for: *" + data.options[previousVote].name +
-               "*\nYour current vote is: *" + data.options[vote].name +
-               "*\nVote again if you wish, I won't judge your indecisiveness! :wizard:");
-         } else {
-            data.options[vote].count++;
-            bot.reply(message, "Thanks for voting, " + name.split(" ")[0] + ". You voted for: *" + data.options[vote].name +
-               "*\nFeel free to vote again to change your vote. To see more commands, ask for help!");
-         }
-         bot.api.reactions.add({name: "+1", channel: message.channel, timestamp: message.ts});
-         data.users[message.user].vote = vote;
-         controller.storage.teams.save(data);
+		const name = data.users[message.user].name;
+		if (data.users[message.user].vote !== '') {
+			let previousVote = data.users[message.user].vote;
+			data.options[previousVote].count--;
+			data.options[vote].count++;
+			bot.reply(message, "Thanks for revoting, " + name.split(" ")[0] +". You previously voted for: *" + data.options[previousVote].name +
+				"*\nYour current vote is: *" + data.options[vote].name +
+				"*\nVote again if you wish, I won't judge your indecisiveness! :wizard:");
+		} else {
+			data.options[vote].count++;
+			bot.reply(message, "Thanks for voting, " + name.split(" ")[0] + ". You voted for: *" + data.options[vote].name +
+				"*\nFeel free to vote again to change your vote. To see more commands, ask for help!");
+		}
+		bot.api.reactions.add({name: "+1", channel: message.channel, timestamp: message.ts});
+		data.users[message.user].vote = vote;
+		controller.storage.teams.save(data);
    }
 
    this.list = function (message) {
@@ -200,31 +200,35 @@ function poll(controller, bot) {
                noAnswer = noAnswer.concat(", " + name[0] + " " + name[1][0] + ".");
             }
          }
-         bot.reply(message, "*Here are the users that have not voted:*\n" + noAnswer);
+			if (noAnswer === '') {
+				bot.reply(message, "All users have voted in the poll!");
+			} else {
+				bot.reply(message, "*Here are the users that have not voted:*\n" + noAnswer);
+			}
       });
    }
 
    this.addOption = function (message, data) {
-         if (helper.isEmpty(data.options)) {
-            data.options['1'] = {name: message.match[1]};
-            saveOption(message, data, 'added');
-         } else {
-            let addOption = message.match[1].toLowerCase(),
-            dup = false;
-            for (let option in data.options) {
-               if (addOption === data.options[option].name.toLowerCase()) {
-                  dup = true;
-                  bot.reply(message, "*" + message.match[1] + "* has already been added!");
-                  break;
-               }
-            }
-            if (!dup) {
-               let highest = Object.keys(data.options).pop();
-               highest = parseInt(highest) + 1;
-               data.options[highest.toString()] = {name: message.match[1]};
-               saveOption(message, data, 'added');
-            }
-         }
+		if (helper.isEmpty(data.options)) {
+			data.options['1'] = {name: message.match[1]};
+			saveOption(message, data, 'added');
+		} else {
+			let addOption = message.match[1].toLowerCase(),
+			dup = false;
+			for (let option in data.options) {
+				if (addOption === data.options[option].name.toLowerCase()) {
+					dup = true;
+					bot.reply(message, "*" + message.match[1] + "* has already been added!");
+					break;
+				}
+			}
+			if (!dup) {
+				let highest = Object.keys(data.options).pop();
+				highest = parseInt(highest) + 1;
+				data.options[highest.toString()] = {name: message.match[1]};
+				saveOption(message, data, 'added');
+			}
+		}
    }
 
    this.removeOption = function (message, data) {
