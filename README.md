@@ -8,14 +8,14 @@ Clone this repository then head into the directory and use `npm install` to inst
 
 You will need to get a [bot token for Slack](https://my.slack.com/services/new/bot).
 
-Go into the bot folder and create a new .env file. In the file, insert the following lines:
+Create a new .env file. In the file, insert the following lines:
 ```
 token={YOUR BOT TOKEN}
 ```
 
 Then to deploy the bot, run:
 ```
-node solunch-bot.js
+npm start
 ```
 
 ### Deploy Indefinitely
@@ -27,12 +27,12 @@ npm install -g forever
 
 When you're ready to run the bot, you can run the command:
 ```
-forever start solunch-bot.js
+forever start bot/solunch-bot.js
 ```
 
 To stop the bot:
 ```
-forever stop solunch-bot.js
+forever stop bot/solunch-bot.js
 ```
 
 ## First Deployment
