@@ -4,10 +4,10 @@ function admins(controller, bot) {
 	const self = this;
 
 	this.add = function(message, data) {
-		if (message.match[1][0] == "<" && message.match[1][1] == "@"){
-		   const addUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
+		if (message.match[1].indexOf('<@') === 0){
+		   const addUser = message.match[1].replace('<', '').replace('@', '').replace('>', '');
 		   if (data.admins.hasOwnProperty(addUser)) {
-		      bot.reply(message, "That user is already an admin!");
+		      bot.reply(message, message.match[1] + " is already an admin!");
 		   } else {
 		      bot.api.users.info({user: addUser}, function(err, response) {
 		         if (helper.isEmpty(data.admins)) {
@@ -16,7 +16,7 @@ function admins(controller, bot) {
 		            data.admins[addUser] = {name: response.user.real_name};
 		         }
 		         controller.storage.teams.save(data, function(err, id) {
-		            bot.reply(message, "Successfully added new admin.");
+		            bot.reply(message, "Successfully added " + message.match[1] + " as an admin.");
 		            self.list(message);
 		         });
 		      });
@@ -27,16 +27,16 @@ function admins(controller, bot) {
 	}
 
 	this.remove = function(message, data) {
-		if (message.match[1][0] == "<" && message.match[1][1] == "@"){
-		   const remUser = message.match[1].split('<')[1].split('@')[1].split('>')[0];
-		   if (data.admins.hasOwnProperty(message.user)) {
+		if (message.match[1].indexOf('<@') === 0){
+		   const remUser = message.match[1].replace('<', '').replace('@', '').replace('>', '');
+		   if (data.admins.hasOwnProperty(remUser)) {
 		      delete data.admins[remUser];
 		      controller.storage.teams.save(data, function(err, id) {
-		         bot.reply(message, "Successfully removed admin.");
+		         bot.reply(message, "Successfully removed " + message.match[1] + " from admins.");
 		         self.list(message);
 		      });
 		   } else {
-		      bot.reply(message, "That user is not an admin.");
+		      bot.reply(message, message.match[1] + " is not an admin.");
 		   }
 		} else {
 		   bot.reply(message, "Sorry, but that is not a valid username. Use Slack's @mention to select a user to remove admin priviledges.");

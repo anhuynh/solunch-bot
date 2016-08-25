@@ -170,14 +170,14 @@ function poll(controller, bot) {
    }
 
    this.setChannel = function(message, data) {
-      if (message.match[1][0] == "<" && message.match[1][1] == "#"){
-         const channel = message.match[1].split('<')[1].split('#')[1].split('>')[0];
+      if (message.match[1].indexOf('<#') === 0){
+         const channel = message.match[1].replace('<', '').replace('#', '').replace('>', '').split('|')[0];
          if (data.channel === channel) {
-            bot.reply(message, "That channel has already been set as the poll announcement channel!");
+            bot.reply(message, message.match[1] + " has already been set as the poll announcement channel!");
          } else {
             data.channel = channel;
             controller.storage.teams.save(data, function(err, id) {
-               bot.reply(message, "Successfully saved poll announcement channel.");
+               bot.reply(message, "Successfully saved " + message.match[1] + " as poll announcement channel.");
             });
          }
       } else {
